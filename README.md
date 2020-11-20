@@ -26,7 +26,10 @@ The demo deploys all components together using the [AWS Serverless Application M
 
 3.	create a lambda function Environment variable FIREHOSE_DELIVERY_STREAM as key, step 2 STREAM_NAME as value
 
+4. update function execute iam role policy add follow add  "firehose:PutRecord","firehose:PutRecordBatch" in policy action
+
 4. Clone the repo onto your local development machine:
+
 ```bash
 git clone https://github.com/jw1i/logs-api-firehose-layer.git
 cd logs-api-firehose-layer 
