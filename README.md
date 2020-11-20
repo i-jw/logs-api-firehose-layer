@@ -26,7 +26,17 @@ The demo deploys all components together using the [AWS Serverless Application M
 
 3.	create a lambda function Environment variable FIREHOSE_DELIVERY_STREAM as key, step 2 STREAM_NAME as value
 
-4. update function execute iam role policy add follow add  "firehose:PutRecord","firehose:PutRecordBatch" in policy action
+4. update function execute iam role ,replace REGION  ACCOUNT_ID STREAM_NAME with yours and add into you role policy
+
+		{
+		            "Sid": "VisualEditor0",
+		            "Effect": "Allow",
+		            "Action": [
+		                "firehose:PutRecord",
+		                "firehose:PutRecordBatch"
+		            ],
+		            "Resource": "arn:aws:firehose:REGION:ACCOUNT_ID:deliverystream/STREAM_NAME"
+		}
 
 4. Clone the repo onto your local development machine:
 
