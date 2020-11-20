@@ -22,7 +22,9 @@ The demo deploys all components together using the [AWS Serverless Application M
 
 1. [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and login.
 
-2. Clone the repo onto your local development machine:
+2. [Creating an Amazon Kinesis Data Firehose Delivery Stream](https://docs.aws.amazon.com/firehose/latest/dev/basic-create.html) make note of stream name
+
+3. Clone the repo onto your local development machine:
 ```bash
 git clone https://github.com/aws-samples/aws-lambda-extensions
 cd  logs-api-firehose-lambda-extension
