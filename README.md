@@ -26,8 +26,9 @@ The demo deploys all components together using the [AWS Serverless Application M
 
 3. Clone the repo onto your local development machine:
 ```bash
-git clone https://github.com/aws-samples/aws-lambda-extensions
-cd  logs-api-firehose-lambda-extension
+wget https://github.com/JW-i/logs-api-firehose-layer/archive/V0.1.zip
+git clone https://github.com/JW-i/logs-api-firehose-layer.git
+unzip V0.1.zip && cd logs-api-firehose-layer 
 ```
 
 1. Run the following command for AWS SAM to deploy the components as specified in the `template.yml` file:
