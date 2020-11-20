@@ -22,12 +22,14 @@ The demo deploys all components together using the [AWS Serverless Application M
 
 1. [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and login.
 
-2. [Creating an Amazon Kinesis Data Firehose Delivery Stream](https://docs.aws.amazon.com/firehose/latest/dev/basic-create.html) make note of stream name
+2. [Creating an Amazon Kinesis Data Firehose Delivery Stream](https://docs.aws.amazon.com/firehose/latest/dev/basic-create.html) make notes of STREAM_NAME
 
-3. Clone the repo onto your local development machine:
+3.	create a lambda function Environment variable FIREHOSE_DELIVERY_STREAM as key, step 2 STREAM_NAME as value
+
+4. Clone the repo onto your local development machine:
 ```bash
-git clone https://github.com/aws-samples/aws-lambda-extensions
-cd  logs-api-firehose-lambda-extension
+git clone https://github.com/jw1i/logs-api-firehose-layer.git
+cd logs-api-firehose-layer 
 ```
 
 1. Run the following command for AWS SAM to deploy the components as specified in the `template.yml` file:
