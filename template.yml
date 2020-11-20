@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda Extensions Logs API Firehose Delivery Stream
+
+Globals:
+  Function:
+    Tracing: Active
+    Tags:
+      Application: LogsExtensionKinesisFirehose
+Resources:
+  FirehoseLogExtensionsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      Description: Layer containing extension(s)
+      ContentUri: src/
+      CompatibleRuntimes:
+        - python3.8
+      LicenseInfo: 'Available under the MIT-0 license.'
+      RetentionPolicy: Delete
+    Metadata:
+      BuildMethod: makefile
+
+Outputs:
+  ExtensionsLayer:
+    Value: !Ref FirehoseLogExtensionsLayer
+    Description: Log Extension Layer ARN
