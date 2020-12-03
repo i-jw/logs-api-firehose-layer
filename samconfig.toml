@@ -1,9 +1,0 @@
-version = 0.1
-[default]
-[default.deploy]
-[default.deploy.parameters]
-stack_name = "firehose-logs-api-extension"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-17a8dyjojihh4"
-s3_prefix = "firehose-logs-api-extension"
-region = "us-west-2"
-capabilities = "CAPABILITY_IAM"

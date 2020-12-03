@@ -1,77 +1,62 @@
-# Logs API Firehose Lambda Extension Demo
+# Logs API Firehose Layer
 
-This is a demo of the logging functionality available with [AWS Lambda](https://aws.amazon.com/lambda/) Extensions to send logs directly from Lambda to [Amazon Kinesis Data Firehose(Firehose delivery stream)](https://aws.amazon.com/kinesis/data-firehose).
+这是一个可以在AWS中国区账号下使用的lambda层，该层实现了订阅Lambda Logs API 并发送到Kinesis Firehose Delivery Stream
 
-For more information on the extensions logs functionality, see the blog post [Using AWS Lambda extensions to send logs to custom destinations](https://aws.amazon.com/blogs/compute/using-aws-lambda-extensions-to-send-logs-to-custom-destinations/)
+可以通过AWS控制台中 Serverless application repository 进行部署，
 
-> This is a simple example extension to help you start investigating the Lambda Runtime Logs API. This code is not production ready, and it has never intended to be. Use it with your own discretion after testing thoroughly.  
+### 步骤如下：
 
-The extension uses the Extensions API to register for INVOKE and SHUTDOWN events. The extension, using the Logs API, then subscribes to receive platform and function logs, but not extension logs. The extension runs a local HTTP endpoint listening for HTTP POST events. Lambda delivers log batches to this endpoint. The code can be amended (see the comments) to handle each log record in the batch. This can be used to process, filter, and route individual log records to any preferred destination
+1、使用IAM用户 [登录AWS账号](https://console.amazonaws.cn/?nc2=h_m_mc)
 
-The example creates a lambda layer put logs to firehose delivery streams . A Lambda function is configured with an environment variable ( FIREHOSE_DELIVERY_STREAM )to specify the delivery stream name. Lambda streams the logs to the extension. The extension copies the logs to the delivery stream.
+2、选择北京区域
 
-The extension uses the Python runtime from the execution environment to show the functionality. The recommended best practice is to compile your extension into an executable binary and not rely on the runtime.
+![](images/02.png)
 
-The demo deploys all components together using the [AWS Serverless Application Model (AWS SAM)](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+3、在控制台左侧点击Service，在弹出的搜索框中输入 **sar**，点击出现的 **Serverless Application Repository** 进入该服务的控制台。
 
-## Requirements
+![](images/03.png)
 
-* [AWS SAM CLI ](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) - **minimum version 0.48**.
+4、在 Serverless application repository 控制台中输入 **logs-api-firehose-layer** 点击出现的Lambda层的依赖
 
-## Installation instructions
+![](images/04.png)
 
-1. [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and login.
+5、点击标题会跳转到lambda层部署的界面，滑动到最下方点击部署，等待lambda层部署完毕，并记录ARN
 
-2. [Creating an Amazon Kinesis Data Firehose Delivery Stream](https://docs.aws.amazon.com/firehose/latest/dev/basic-create.html) make notes of STREAM_NAME
+![](images/050.png)
+![](images/051.png)
 
-3.	create a lambda function Environment variable FIREHOSE_DELIVERY_STREAM as key, step 2 STREAM_NAME as value
+6、在北京或宁夏区域创建Kinesis Delivery Stream 并配置 stream 的目的地, 并记录 name 和 region
 
-4. update function execute iam role ,replace REGION  ACCOUNT_ID STREAM_NAME with yours and add into you role policy
+![](images/06.png)
 
-		{
-		            "Sid": "VisualEditor0",
-		            "Effect": "Allow",
-		            "Action": [
-		                "firehose:PutRecord",
-		                "firehose:PutRecordBatch"
-		            ],
-		            "Resource": "arn:aws:firehose:REGION:ACCOUNT_ID:deliverystream/STREAM_NAME"
-		}
+7、为lambda函数添加层，并选择刚刚创建的层以及对应的版本号，同时为lambda添加两个环境变量，覆盖默认值：
+	
+	步骤6中创建的stream名称
+	FIREHOSE_DELIVERY_STREAM	
+	
+	步骤6中创建的stream 所在的区域
+	REGION
+	
+	如果没有创建环境变量 lambda层默认写入当前账号 cn-northwest-1 区域 名为 lambda-logs-api-stream 的 Kinesis Delivery Stream ， 如果账号中未创建对应的stream 也未配置环境变量会导致lambda 插件报错退出。
+	
+![](images/070.png)
+![](images/071.png)
+![](images/072.png)
 
-4. Clone the repo onto your local development machine:
+8、 为lambda添加写入Kinesis Delivery Stream的权限，替换JSON中Resource的值为账号中Kinesis Delivery Stream 的 ARN ，并将JSON添加到Lambda的执行权限中。JSON如下：
 
-```bash
-git clone https://github.com/jw1i/logs-api-firehose-layer.git
-cd logs-api-firehose-layer 
-```
+	{
+	    "Sid": "VisualEditor0",
+	    "Effect": "Allow",
+	    "Action": [
+	        "firehose:PutRecord",
+	        "firehose:PutRecordBatch"
+	    ],
+	    "Resource": "arn:aws:firehose:REGION:ACCOUNT_ID:deliverystream/STREAM_NAME"
+	}
 
-1. Run the following command for AWS SAM to deploy the components as specified in the `template.yml` file:
-```bash
-sam build
-# If you don't have 'Python' or 'make' installed, you can use the option to build using a container which uses a python3.8 Docker container image
-# sam build --use-container
-sam deploy --stack-name firehose-logs-extension --guided
-```
+Lambda执行角色iam policy类似下方：
 
-During the prompts:
+![](images/08.png)
 
-* Accept the default Stack Name `firehose-logs-extension`.
-* Enter your preferred Region
-* Accept the defaults for the remaining questions.
-
-AWS SAM deploys the application stack which includes the Lambda function and an IAM Role. AWS SAM creates a layer for the runtime, a layer for the extension, and adds them to the function.
-
-Note the outputted ExtensionsLayer Value .
-
-## Add the newly created layer version to a Python 3.8 runtime Lambda function.
-
-## Invoke the Lambda function
-You can now invoke the Lambda function. Amend the Region and use the following command:
-```bash
-aws lambda update-function-configuration --region <use your region> --function-name <your function name> --layers <LayerVersionArn from previous step>
-```
-The logging extension also receives the log stream directly from Lambda, and put records to kinesis firehose stream.
-
-Browse to the [Amazon Kinesis Data Firehose](https://console.aws.amazon.com/firehose). Navigate to the Amazon Kinesis Data Firehose Delivery Stream Console Monitor the stream data collect. 
-
-Downloading the file object containing the copied log stream. The log contains the same platform and function logs, but not the extension logs, as specified during the subscription.
+9、完成配置后便可以将lambda 运行的日志输出到firehose delivery stream 进而将日志输出到s3或者elastic search
